@@ -1,0 +1,161 @@
+<html>
+<head>
+	<link rel="stylesheet prefetch" href="http://fonts.googleapis.com/css?family=Playball">
+	<style type="text/css">
+
+	body {
+	    margin: auto;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        background-color: #E8E6D3;
+	}
+
+	a {
+	  font-family: sans-serif;
+	  text-decoration: none;
+	  color: #fff;
+	  display: inline-block;
+	  padding: .5em 1em;
+	  background: #C8C8A9;
+	  margin: .5em;
+	  border-radius: 3px;
+	}
+
+	a.btn {
+	  background: #FC9D98;
+	}
+
+	#log{
+	  background: #BDCFA2;
+	  margin-top: 20px;
+	  border-radius: 3px;
+	}
+
+	#out{
+	  font-family: sans-serif;
+	  text-decoration: none;
+	  color: #FFFFFF;
+	  display: inline-block;
+	  padding: .5em 1em;
+	  margin: 1em;
+	  text-align: left;
+	  max-width: 800px;
+
+	}
+
+	#channel{
+		font-family: sans-serif;
+	}
+
+	.circle{
+		width:10px;
+		height:10px;
+		border-radius:5px;
+		font-size:2px;
+		color:#fff;
+		line-height:10px;
+		text-align:center;
+		background:#FE4365;
+		display: inline-block;
+	}
+
+	h1 {
+		font-family: 'Playball', cursive;
+  		font-size: 6em;
+ 		font-weight: 700;
+  		text-align: center;
+  		color: #FC9D98;
+  		margin: 0.25em 0; // Cosmetic value
+	}
+
+	h2 {
+		font-family: 'Playball', cursive;
+  		font-size: 2em;
+ 		font-weight: 700;
+  		text-align: center;
+  		color: #FC9D98;
+  		margin: 0.25em 0; // Cosmetic value
+	}
+
+	ul {
+		width: 100%;
+		padding: 1%;
+		display: block;
+	}
+	li {
+		padding: 2%;
+		color: black;
+		font-weight: bolder;
+		display: inline;
+		width: 25%;
+		border-style: solid;
+		border-color: black;
+		border-left-width: 10px;
+		border-bottom-width: 10px;
+	}
+
+	</style>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+  		var socket = io.connect('');
+  		socket.on('event', function (data) {
+    		document.getElementById('out').innerHTML = 
+    			document.getElementById('out').innerHTML + 
+    			"<div class='circle'></div>  " + syntaxHighlight(data) + "</br></br>";
+  		});
+  		function subscribe() {
+  			var channel = document.getElementById('channel').value;
+  			socket.emit('subscribe', channel);
+  		}
+  		function unsubscribe() {
+  			var channel = document.getElementById('channel').value;
+  			socket.emit('unsubscribe', channel);
+  		}
+  		function clear_output() {
+  			document.getElementById('out').innerHTML = '';
+  		}
+
+		function syntaxHighlight(json) {
+ 			if (typeof json != 'string') {
+        		json = JSON.stringify(json, undefined, 2);
+    		}
+    		json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    		return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+	        	var cls = 'number';
+    	    	if (/^"/.test(match)) {
+        	    	if (/:$/.test(match)) {
+            		    cls = 'key';
+            		} else {
+                		cls = 'string';
+            		}
+        		} else if (/true|false/.test(match)) {
+            		cls = 'boolean';
+        		} else if (/null/.test(match)) {
+            		cls = 'null';
+        		}
+        	return '<span class="' + cls + '">' + match + '</span>';
+    		});
+		}
+</script>
+</head>
+<body>
+
+	<div class="container">
+		<h1> TEST SOCKET IO </h1>
+		<input type="text" id="channel"/>
+		<a href="#" id='subscribed' onclick='subscribe()'>subscribe</a>
+		<a href="#" id='unsubscribed' onclick='unsubscribe()'>unsubscribe</a>
+		<a href="#" id='clear' onclick='clear_output()'>clear</a>
+	
+		<div id="log">
+			<span id="out"></span>
+		</div>
+	</div>
+
+</body>
+</html>
